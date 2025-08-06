@@ -1,5 +1,5 @@
-const WIDTH = 40; // ширина карты
-const HEIGHT = 24; // высота карты
+const WIDTH = 30; // ширина карты
+const HEIGHT = 20; // высота карты
 const TILE_SIZE = 50; // размер изображения
 
 let map = []; // 2D массив: "W" = wall, " " = floor
@@ -8,6 +8,7 @@ const fieldElement = document.querySelector(".field");
 // Инициализация игры
 function init() {
   generateMap(); // генерация карты
+  generateRandomRooms();
   renderMap(); // отображение карты
 }
 
@@ -39,5 +40,28 @@ function renderMap() {
 }
 
 // Этап 3 Разместить случайное количество (5 - 10) прямоугольных “комнат” со случайными размерами (3 - 8 клеток в длину и ширину)
+function getRandomNum(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+function generateRandomRooms() {
+  const countRandomRoom = getRandomNum(5, 10);
+  console.log("countRandomRoom", countRandomRoom); // 5
+  for (let i = 0; i < countRandomRoom; i++) {
+    // i = 0 widthRoom 5; heightRoom 8; x 6; y 8
+    const widthRoom = getRandomNum(3, 8); // ширина конматы 5
+    const heightRoom = getRandomNum(3, 8); // высота комнаты 8
+    const x = getRandomNum(1, WIDTH - widthRoom - 1); // 6
+    const y = getRandomNum(1, HEIGHT - heightRoom - 1); //  8
+    console.log(
+      `widthRoom ${widthRoom}; heightRoom ${heightRoom}; x ${x}; y ${y}`
+    );
+    for (let dy = 0; dy < heightRoom; dy++) {
+      for (let dx = 0; dx < widthRoom; dx++) {
+        map[y + dy][x + dx] = "";
+      }
+    }
+  }
+}
 
 window.addEventListener("DOMContentLoaded", init);
