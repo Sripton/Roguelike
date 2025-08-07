@@ -8,8 +8,9 @@ const fieldElement = document.querySelector(".field");
 // Инициализация игры
 function init() {
   generateMap(); // генерация карты
-  generateRandomRooms();
-  generateRandomCoridors();
+  generateRandomRooms(); // генерация комнат
+  generateRandomCoridors(); // генерация коридоров для прохода
+  placeItems();
   renderMap(); // отображение карты
 }
 
@@ -86,6 +87,49 @@ function generateRandomCoridors() {
       map[y][col] = "";
     }
   }
+}
+
+// Этап 5 Разместить мечи (2 шт) и зелья здоровья (10 шт) в пустых местах
+
+function placeItems() {
+  const emptyCells = [];
+  // Ищем все пустые клетки
+  for (let y = 0; y < HEIGHT; y++) {
+    for (let x = 0; x < WIDTH; x++) {
+      if (map[y][x] === "") {
+        emptyCells.push({ y, x }); // {y: 0, x: 4}
+      }
+    }
+  }
+  // Рандомно перемещаем значения в массиве
+  shuffleArray(emptyCells);
+
+  // Рандомно размещаем мечи по пустым ячейкам
+  for (let i = 0; i < 2; i++) {
+    const { y, x } = emptyCells[i];
+    // console.log(y, x);
+    map[y][x] = "SW";
+  }
+  // Рандомно размещаем зелья по пустым ячейкам
+  // for (let j = 0; j < 10; j++) {
+  //   const { y, x } = emptyCells[j];
+  //   // console.log(y, x);
+  //   map[y][x] = "HP";
+  // }
+  for (let j = 5; j < 15; j++) {
+    // начинать индекс не с нуля
+    const { y, x } = emptyCells[j];
+    map[y][x] = "HP";
+  }
+}
+
+// Вспомогательная функция для перемешивания массива
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
 }
 
 window.addEventListener("DOMContentLoaded", init);
