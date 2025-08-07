@@ -89,7 +89,10 @@ function generateRandomCoridors() {
   }
 }
 
-// Этап 5 Разместить мечи (2 шт) и зелья здоровья (10 шт) в пустых местах
+// Этап 5
+// Разместить мечи (2 шт) и зелья здоровья (10 шт) в пустых местах
+// Поместить героя в случайное пустое место
+// Поместить 10 противников с случайные пустые места
 
 function placeItems() {
   const emptyCells = [];
@@ -105,21 +108,28 @@ function placeItems() {
   shuffleArray(emptyCells);
 
   // Рандомно размещаем мечи по пустым ячейкам
-  for (let i = 0; i < 2; i++) {
+  for (let i = 1; i < 3; i++) {
     const { y, x } = emptyCells[i];
     // console.log(y, x);
     map[y][x] = "SW";
   }
   // Рандомно размещаем зелья по пустым ячейкам
-  // for (let j = 0; j < 10; j++) {
-  //   const { y, x } = emptyCells[j];
-  //   // console.log(y, x);
-  //   map[y][x] = "HP";
-  // }
   for (let j = 5; j < 15; j++) {
     // начинать индекс не с нуля
     const { y, x } = emptyCells[j];
     map[y][x] = "HP";
+  }
+
+  // Рандомно размещаем главного героя по пустым ячейкам
+  for (let i = 0; i < 1; i++) {
+    const { y, x } = emptyCells[i];
+    map[y][x] = "P";
+  }
+
+  // Рандомно размещаем 10 противников  по пустым ячейкам
+  for (let j = 16; j < 26; j++) {
+    const { y, x } = emptyCells[j];
+    map[y][x] = "E";
   }
 }
 
