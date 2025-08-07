@@ -107,30 +107,20 @@ function placeItems() {
   // Рандомно перемещаем значения в массиве
   shuffleArray(emptyCells);
 
+  // index для того что бы элементы раставлялись по разным ячейкам на карте
+  let index = 0;
+
   // Рандомно размещаем мечи по пустым ячейкам
-  for (let i = 1; i < 3; i++) {
-    const { y, x } = emptyCells[i];
-    // console.log(y, x);
-    map[y][x] = "SW";
-  }
+  placeOnTheMap("SW", 2, emptyCells, index);
+
   // Рандомно размещаем зелья по пустым ячейкам
-  for (let j = 5; j < 15; j++) {
-    // начинать индекс не с нуля
-    const { y, x } = emptyCells[j];
-    map[y][x] = "HP";
-  }
+  placeOnTheMap("HP", 10, emptyCells, (index += 2));
 
   // Рандомно размещаем главного героя по пустым ячейкам
-  for (let i = 0; i < 1; i++) {
-    const { y, x } = emptyCells[i];
-    map[y][x] = "P";
-  }
+  placeOnTheMap("P", 1, emptyCells, (index += 10));
 
   // Рандомно размещаем 10 противников  по пустым ячейкам
-  for (let j = 16; j < 26; j++) {
-    const { y, x } = emptyCells[j];
-    map[y][x] = "E";
-  }
+  placeOnTheMap("E", 10, emptyCells, (index += 11));
 }
 
 // Вспомогательная функция для перемешивания массива
@@ -140,6 +130,14 @@ function shuffleArray(array) {
     [array[i], array[j]] = [array[j], array[i]];
   }
   return array;
+}
+
+// Вспомгательная функция для циклов
+function placeOnTheMap(symbol, count, emptyCells, startIndex) {
+  for (let i = 0; i < count; i++) {
+    const { y, x } = emptyCells[startIndex + i];
+    map[y][x] = symbol;
+  }
 }
 
 window.addEventListener("DOMContentLoaded", init);
