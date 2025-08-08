@@ -1,6 +1,7 @@
 const WIDTH = 40; // ширина карты
 const HEIGHT = 24; // высота карты
 const TILE_SIZE = 50; // размер изображения
+let hasSword = false; // есть ли мечь у врага
 
 let map = []; // 2D массив: "W" = wall, " " = floor
 const fieldElement = document.querySelector(".field");
@@ -165,7 +166,7 @@ function findPlayer() {
 function handleKeyPlayer(event) {
   const key = event.key;
   const { y, x } = findPlayer();
-  console.log(`y ${y}; x ${x}`);
+  console.log(`y ${y}; x ${x}`); // 7 6
   if (key === "w") {
     movePlayer(y, x, -1, 0);
     renderMap(); // перересовываем карту
@@ -180,6 +181,10 @@ function handleKeyPlayer(event) {
   }
   if (key === "a") {
     movePlayer(y, x, 0, -1);
+    renderMap();
+  }
+  if (event.code === "Space") {
+    attackTheEnemy(y, x);
     renderMap();
   }
 }
@@ -198,6 +203,31 @@ function movePlayer(y, x, dy, dx) {
   ) {
     map[y][x] = "";
     map[newY][newX] = "P";
+  }
+}
+
+// ------------------------------- Этап 7 ------------------------------------
+// Сделать возможность атаки клавишей пробел ВСЕХ противников
+// находящихся на соседних клетках
+// Сделать атаку героя противником, если герой находится на соседней клетке с противником
+
+function attackTheEnemy(y, x) {
+  const direction = [
+    { dy: -1, dx: 0 }, // вниз
+    { dy: 1, dx: 0 }, // вверх
+    { dy: 0, dx: -1 }, // влево
+    { dy: 0, dx: 1 }, // вправо
+  ];
+  for (let { dy, dx } of direction) {
+    const newY = y + dy;
+    const newX = x + dx;
+
+    if (
+      (newY >= 0 && newY < HEIGHT && newX >= 0 && newX < WIDTH) ||
+      map[newY][newX] === "P"
+    ) {
+      map[newY][newX] = "";
+    }
   }
 }
 
