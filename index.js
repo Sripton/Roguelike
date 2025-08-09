@@ -155,7 +155,7 @@ function findPlayer() {
   for (let y = 0; y < HEIGHT; y++) {
     for (let x = 0; x < WIDTH; x++) {
       if (map[y][x] === "P") {
-        console.log(`y ${y}; x ${x}`);
+        // console.log(`y ${y}; x ${x}`);
         return { y, x };
       }
     }
@@ -164,9 +164,10 @@ function findPlayer() {
 }
 // Создаю функцию упарвления игроком с помошью клавищ  WASD
 function handleKeyPlayer(event) {
+  event.preventDefault();
   const key = event.key;
   const { y, x } = findPlayer();
-  console.log(`y ${y}; x ${x}`); // 7 6
+  // console.log(`y ${y}; x ${x}`); // 7 6
   if (key === "w") {
     movePlayer(y, x, -1, 0);
     renderMap(); // перересовываем карту
@@ -188,6 +189,7 @@ function handleKeyPlayer(event) {
     renderMap();
   }
 }
+// console.log("hasSword", hasSword);
 
 // Фукнция передвижения
 function movePlayer(y, x, dy, dx) {
@@ -210,6 +212,7 @@ function movePlayer(y, x, dy, dx) {
 // Сделать возможность атаки клавишей пробел ВСЕХ противников
 // находящихся на соседних клетках
 // Сделать атаку героя противником, если герой находится на соседней клетке с противником
+// Сделать увеличение силы удара героя при наступлении героя на меч (и удаление меча)
 
 function attackTheEnemy(y, x) {
   const direction = [
@@ -218,18 +221,36 @@ function attackTheEnemy(y, x) {
     { dy: 0, dx: -1 }, // влево
     { dy: 0, dx: 1 }, // вправо
   ];
-  for (let { dy, dx } of direction) {
+  const diagonals = [
+    { dy: -1, dx: -1 }, // вверх-влево
+    { dy: -1, dx: 1 }, // вверх-вправо
+    { dy: 1, dx: -1 }, // вниз-влево
+    { dy: 1, dx: 1 }, // вниз-впарво
+  ];
+  const range2 = [
+    { dy: -2, dx: 0 }, // вниз
+    { dy: 2, dx: 0 }, // вверх
+    { dy: 0, dx: -2 }, // влево
+    { dy: 0, dx: 2 }, // вправо
+  ];
+
+  let dirs = [...direction, ...diagonals, ...range2];
+  for (let { dy, dx } of dirs) {
     const newY = y + dy;
     const newX = x + dx;
-
     if (
-      (newY >= 0 && newY < HEIGHT && newX >= 0 && newX < WIDTH) ||
-      map[newY][newX] === "P"
+      newY >= 0 &&
+      newY < HEIGHT &&
+      newX >= 0 &&
+      newX < WIDTH &&
+      map[newY][newX] === "E"
     ) {
       map[newY][newX] = "";
     }
   }
 }
+
+function swordPower() {}
 
 window.addEventListener("keydown", handleKeyPlayer);
 window.addEventListener("DOMContentLoaded", init);
