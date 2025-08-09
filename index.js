@@ -13,6 +13,7 @@ function init() {
   generateRandomCoridors(); // генерация коридоров для прохода
   placeItems();
   renderMap(); // отображение карты
+  // console.log(randomEnemyMovement());
 }
 
 // ------------------------------- Этап 1 ------------------------------------
@@ -167,35 +168,42 @@ function handleKeyPlayer(event) {
   event.preventDefault();
   const key = event.key;
   const { y, x } = findPlayer();
+  let action = false;
   // console.log(`y ${y}; x ${x}`); // 7 6
   if (key === "w") {
     movePlayer(y, x, -1, 0);
-    renderMap(); // перересовываем карту
+    action = true;
   }
   if (key === "s") {
     movePlayer(y, x, 1, 0);
-    renderMap();
+    action = true;
   }
   if (key === "d") {
     movePlayer(y, x, 0, 1);
-    renderMap();
+    action = true;
   }
   if (key === "a") {
     movePlayer(y, x, 0, -1);
-    renderMap();
+    action = true;
   }
   if (event.code === "Space") {
     attackTheEnemy(y, x);
+    action = true;
+  }
+  if (action) {
+    randomEnemyMovement();
     renderMap();
   }
 }
-// console.log("hasSword", hasSword);
 
+// Функция для изменения состояния, если игрок подобрал меч
+function swordPower() {
+  hasSword = true;
+}
 // Фукнция передвижения
 function movePlayer(y, x, dy, dx) {
   const newY = y + dy;
   const newX = x + dx;
-
   // Проверка на границы и проходимость
   if (
     newY >= 0 &&
@@ -263,9 +271,71 @@ function attackTheEnemy(y, x) {
   }
 }
 
-function swordPower() {
-  hasSword = true;
+// ------------------------------- Этап 8 ------------------------------------
+// Сделать случайное передвижение противников (на выбор, либо передвижение по одной случайной оси,
+// либо случайное направление каждый ход, либо поиск и атака героя)
+
+function findEnemyPosition() {
+  const positionEnemy = [];
+  for (let y = 0; y < HEIGHT; y++) {
+    for (let x = 0; x < WIDTH; x++) {
+      if (map[y][x] === "E") {
+        positionEnemy.push({ y, x });
+      }
+    }
+  }
+  return positionEnemy;
+}
+
+function randomEnemyMovement() {
+  const enemies = findEnemyPosition();
+  // чтобы не было перекоса — перемешаем порядок передвижения
+  shuffleArray(enemies);
+  const dirs = [
+    { dy: -1, dx: 0 }, // вверх
+    { dy: 1, dx: 0 }, // вниз
+    { dy: 0, dx: -1 }, // влево
+    { dy: 0, dx: 1 }, // вправо
+  ];
+
+  for (let { y, x } of enemies) {
+    if (map[y][x] !== "E") continue;
+    // getRandomNum(0, dirs.length - 1) (0,3) случайное число
+    const { dy, dx } = dirs[getRandomNum(0, dirs.length - 1)];
+    // if (dy === -1 && dx === 0) {
+    //   return `вверх dy = ${dy}; dx = ${dx}`;
+    // } else if (dy === 1 && dx === 0) {
+    //   return `вниз dy = ${dy}; dx = ${dx}`;
+    // } else if (dy === 0 && dx === -1) {
+    //   return `влево dy = ${dy}; dx = ${dx}`;
+    // } else if (dy === 0 && dx === 1) {
+    //   return `вправо dy = ${dy}; dx = ${dx}`;
+    // }
+
+    const newY = y + dy; // новая координата врага по вертикали после шага.
+    const newX = x + dx; // новая координата врага по горизонтали после шага.
+    // Текущая позиция врага: y = 5, x = 10
+    // Выбрали направление { dy: -1, dx: 0 } (вверх).
+    // Проверка границы. Пропускаем обработку и переходим к следующему врагу
+    // map[-1][5] или map[24][3] -> Cannot read properties of undefined.
+    if (newY < 0 || newY >= HEIGHT || newX < 0 || newX >= WIDTH) continue;
+
+    // враг ходит только на пустое поле или на игрока
+    if (map[newY][newX] === "") {
+      map[newY][newX] = "E";
+      map[y][x] = "";
+    } else if (map[newY][newX] === "P") {
+      map[newY][newX] = "E";
+      map[y][x] = "";
+      alert("Игрок ранен");
+    }
+  }
 }
 
 window.addEventListener("keydown", handleKeyPlayer);
 window.addEventListener("DOMContentLoaded", init);
+
+// window.addEventListener("DOMContentLoaded", () => {
+//   init();
+//   console.log(findEnemyPosition());
+// });
