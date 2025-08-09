@@ -195,14 +195,20 @@ function handleKeyPlayer(event) {
 function movePlayer(y, x, dy, dx) {
   const newY = y + dy;
   const newX = x + dx;
+
   // Проверка на границы и проходимость
   if (
     newY >= 0 &&
     newY < HEIGHT &&
     newX >= 0 &&
     newX < WIDTH &&
-    (map[newY][newX] === "" || map[newY][newX] === "HP")
+    (map[newY][newX] === "" ||
+      map[newY][newX] === "HP" ||
+      map[newY][newX] === "SW")
   ) {
+    if (map[newY][newX] === "SW") {
+      swordPower();
+    }
     map[y][x] = "";
     map[newY][newX] = "P";
   }
@@ -215,26 +221,33 @@ function movePlayer(y, x, dy, dx) {
 // Сделать увеличение силы удара героя при наступлении героя на меч (и удаление меча)
 
 function attackTheEnemy(y, x) {
+  // Базовые напрвления
   const direction = [
     { dy: -1, dx: 0 }, // вниз
     { dy: 1, dx: 0 }, // вверх
     { dy: 0, dx: -1 }, // влево
     { dy: 0, dx: 1 }, // вправо
   ];
-  const diagonals = [
-    { dy: -1, dx: -1 }, // вверх-влево
-    { dy: -1, dx: 1 }, // вверх-вправо
-    { dy: 1, dx: -1 }, // вниз-влево
-    { dy: 1, dx: 1 }, // вниз-впарво
-  ];
-  const range2 = [
-    { dy: -2, dx: 0 }, // вниз
-    { dy: 2, dx: 0 }, // вверх
-    { dy: 0, dx: -2 }, // влево
-    { dy: 0, dx: 2 }, // вправо
-  ];
 
-  let dirs = [...direction, ...diagonals, ...range2];
+  let dirs = [...direction];
+
+  // Если меч был поднят добавлем 2 ударные  клетки  и подиагонали
+  if (hasSword) {
+    const diagonals = [
+      { dy: -1, dx: -1 }, // вверх-влево
+      { dy: -1, dx: 1 }, // вверх-вправо
+      { dy: 1, dx: -1 }, // вниз-влево
+      { dy: 1, dx: 1 }, // вниз-впарво
+    ];
+    const range2 = [
+      { dy: -2, dx: 0 }, // вниз
+      { dy: 2, dx: 0 }, // вверх
+      { dy: 0, dx: -2 }, // влево
+      { dy: 0, dx: 2 }, // вправо
+    ];
+    dirs = [...direction, ...diagonals, ...range2];
+  }
+
   for (let { dy, dx } of dirs) {
     const newY = y + dy;
     const newX = x + dx;
@@ -250,7 +263,9 @@ function attackTheEnemy(y, x) {
   }
 }
 
-function swordPower() {}
+function swordPower() {
+  hasSword = true;
+}
 
 window.addEventListener("keydown", handleKeyPlayer);
 window.addEventListener("DOMContentLoaded", init);
