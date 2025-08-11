@@ -2,6 +2,7 @@ const WIDTH = 40; // ширина карты
 const HEIGHT = 24; // высота карты
 const TILE_SIZE = 50; // размер изображения
 let hasSword = false; // есть ли мечь у врага
+let playerHP = 3; // Ко-во жизней  героя
 
 let map = []; // 2D массив: "W" = wall, " " = floor
 const fieldElement = document.querySelector(".field");
@@ -214,11 +215,17 @@ function movePlayer(y, x, dy, dx) {
     newX >= 0 &&
     newX < WIDTH &&
     (map[newY][newX] === "" ||
-      map[newY][newX] === "HP" ||
-      map[newY][newX] === "SW")
+      map[newY][newX] === "SW" ||
+      // можно идти  на зелье только если нужно лечение
+      (map[newY][newX] === "HP" && playerHP < 3))
   ) {
     if (map[newY][newX] === "SW") {
       swordPower();
+    }
+    if (map[newY][newX] === "HP") {
+      if (playerHP < 3) {
+        playerHP++;
+      }
     }
     map[y][x] = "";
     map[newY][newX] = "P";
@@ -343,9 +350,6 @@ function randomEnemyMovement() {
 // ------------------------------- Этап 9 ------------------------------------
 // Если противник ранил героя, герой рандомно появляется на новой клетке и игра продолжается,
 //  фиксируется ко-во ранений, если ранений было < 3 то игра заканчивается.
-
-// Ко-во жизней  героя
-let playerHP = 3;
 
 // определение границ
 function definingBoundaries(y, x) {
