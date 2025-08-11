@@ -14,6 +14,8 @@ function init() {
   placeItems();
   renderMap(); // отображение карты
   // console.log(randomEnemyMovement());
+  // console.log(getEmptyFloorCells());
+  // console.log(respawnPlayerRandom());
 }
 
 // ------------------------------- Этап 1 ------------------------------------
@@ -78,6 +80,7 @@ function generateRandomRooms() {
 function generateRandomCoridors() {
   const rowCount = getRandomNum(3, 5); // горизонтальная линия 3 4 5
   const colCount = getRandomNum(3, 5); // вертикальная линия 3 4 5
+
   // Горизонтальные проходы rowCount = 4
   for (let i = 0; i < rowCount; i++) {
     const row = getRandomNum(0, HEIGHT - 1); // 0 - 23 => 24
@@ -275,6 +278,7 @@ function attackTheEnemy(y, x) {
 // Сделать случайное передвижение противников (на выбор, либо передвижение по одной случайной оси,
 // либо случайное направление каждый ход, либо поиск и атака героя)
 
+//  Ищем все позиции игроков
 function findEnemyPosition() {
   const positionEnemy = [];
   for (let y = 0; y < HEIGHT; y++) {
@@ -324,12 +328,71 @@ function randomEnemyMovement() {
     if (map[newY][newX] === "") {
       map[newY][newX] = "E";
       map[y][x] = "";
-    } else if (map[newY][newX] === "P") {
-      map[newY][newX] = "E";
-      map[y][x] = "";
-      alert("Игрок ранен");
+    }
+    //  else if (map[newY][newX] === "P") {
+    //   map[newY][newX] = "E";
+    //   map[y][x] = "";
+    //   alert("Игрок ранен");
+    // }
+    else if (map[newY][newX] === "P") {
+      handleEnemyHitsPlayer(y, x, newY, newX);
     }
   }
+}
+
+// ------------------------------- Этап 9 ------------------------------------
+// Если противник ранил героя, герой рандомно появляется на новой клетке и игра продолжается,
+//  фиксируется ко-во ранений, если ранений было < 3 то игра заканчивается.
+
+// Ко-во жизней  героя
+let playerHP = 3;
+
+// определение границ
+function definingBoundaries(y, x) {
+  return y >= 0 && y < HEIGHT && x >= 0 && x < WIDTH;
+}
+
+// Определить пустые ячейки
+function getEmptyFloorCells() {
+  const cells = [];
+  for (let y = 0; y < HEIGHT; y++) {
+    for (let x = 0; x < WIDTH; x++) {
+      if (map[y][x] === "") {
+        cells.push({ y, x });
+      }
+    }
+  }
+  return cells; // возвращаем массив всех пустых клеток
+}
+
+// Ресположение героя в случайном месте после ранения
+function respawnPlayerRandom() {
+  const empty = getEmptyFloorCells(); // получаем массив всех пустых клеток
+  if (empty.length === 0) return; // некуда ставить — оставляем как есть
+
+  // сохраняем случайный индекс в массиве empty
+  // чтобы мы могли выбрать одну случайную пустую клетку и туда поставить героя.
+  const index = getRandomNum(0, empty.length - 1);
+
+  // достаём координаты клетки с этим индексом
+  const { y, x } = empty[index];
+
+  //  ставим героя на эти координаты
+  map[y][x] = "P";
+}
+
+function handleEnemyHitsPlayer(enemyY, enemyX, playerY, playerX) {
+  playerHP--;
+  // враг занимает клетку, где стоял герой
+  map[playerY][playerX] = "E";
+  map[enemyY][enemyX] = "";
+  if (playerHP <= 0) {
+    alert("Герой погиб");
+    return;
+  }
+
+  alert(`Герой ранен (${3 - playerHP}/3)`);
+  return respawnPlayerRandom();
 }
 
 window.addEventListener("keydown", handleKeyPlayer);
