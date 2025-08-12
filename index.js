@@ -3,6 +3,7 @@ const HEIGHT = 24; // высота карты
 const TILE_SIZE = 50; // размер изображения
 let hasSword = false; // есть ли мечь у врага
 let playerHP = 3; // Ко-во жизней  героя
+let justPickedSword = false; // Когда игрок подбирает меч В swordPower() ставим флаг:
 
 let map = []; // 2D массив: "W" = wall, " " = floor
 const fieldElement = document.querySelector(".field");
@@ -171,9 +172,10 @@ function findPlayer() {
 function handleKeyPlayer(event) {
   event.preventDefault();
   const key = event.key;
+  if (!findPlayer()) return;
   const { y, x } = findPlayer();
+
   let action = false;
-  // console.log(`y ${y}; x ${x}`); // 7 6
   if (key === "w") {
     movePlayer(y, x, -1, 0);
     action = true;
@@ -203,6 +205,7 @@ function handleKeyPlayer(event) {
 // Функция для изменения состояния, если игрок подобрал меч
 function swordPower() {
   hasSword = true;
+  justPickedSword = true;
 }
 // Фукнция передвижения
 function movePlayer(y, x, dy, dx) {
@@ -216,15 +219,25 @@ function movePlayer(y, x, dy, dx) {
     newX < WIDTH &&
     (map[newY][newX] === "" ||
       map[newY][newX] === "SW" ||
-      // можно идти  на зелье только если нужно лечение
-      (map[newY][newX] === "HP" && playerHP < 3))
+      map[newY][newX] === "HP")
   ) {
     if (map[newY][newX] === "SW") {
       swordPower();
+      map[newY][newX] = "";
     }
+    // Всегда можно зайти на клетку
     if (map[newY][newX] === "HP") {
       if (playerHP < 3) {
         playerHP++;
+        // зелье потрачено — просто переезжаем на клетку
+        map[y][x] = "";
+        map[newY][newX] = "P";
+        return;
+      } else {
+        // HP = 3 ? зелье остаётся позади
+        map[y][x] = "HP";
+        map[newY][newX] = "P";
+        return;
       }
     }
     map[y][x] = "";
@@ -394,7 +407,6 @@ function handleEnemyHitsPlayer(enemyY, enemyX, playerY, playerX) {
     alert("Герой погиб");
     return;
   }
-
   alert(`Герой ранен (${3 - playerHP}/3)`);
   return respawnPlayerRandom();
 }
