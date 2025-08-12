@@ -52,7 +52,8 @@
         position: relative;
         width: 2000px;
         height: 1200px;
-        overflow: hidden;
+        /* overflow: hidden; */
+        overflow: visible;
       }
       .field .tile {
         position: absolute;
@@ -113,6 +114,32 @@
       .cl {
         clear: both;
         display: block;
+      }
+
+      /* герой с мечом */
+      .tileP.powered {
+        filter: drop-shadow(0 0 6px #ffd700) drop-shadow(0 0 14px #ffb300);
+        animation: heroGlow 1.2s ease-in-out infinite alternate;
+        z-index: 15;
+      }
+      .tileP.powered::after {
+        content: "";
+        position: absolute;
+        inset: -6px; /* чуть больше тайла 50x50 */
+        pointer-events: none;
+        border-radius: 8px;
+      }
+
+      /* пульсирующее свечение */
+      @keyframes heroGlow {
+        from {
+          filter: drop-shadow(0 0 4px #ffd700) drop-shadow(0 0 8px #ffb300);
+          transform: scale(1);
+        }
+        to {
+          filter: drop-shadow(0 0 10px #ffd700) drop-shadow(0 0 20px #ffb300);
+          transform: scale(1.03);
+        }
       }
     </style>
   </head>

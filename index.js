@@ -43,7 +43,10 @@ function renderMap() {
       tileDiv.classList.add("tile");
       tileDiv.style.left = `${x * TILE_SIZE}px`;
       tileDiv.style.top = `${y * TILE_SIZE}px`;
-      tileDiv.classList.add("tile" + map[y][x]);
+      tileDiv.classList.add("tile", "tile" + map[y][x]);
+      if (map[y][x] === "P" && hasSword) {
+        tileDiv.classList.add("powered");
+      }
       fieldElement.appendChild(tileDiv);
     }
   }
@@ -172,8 +175,9 @@ function findPlayer() {
 function handleKeyPlayer(event) {
   event.preventDefault();
   const key = event.key;
-  if (!findPlayer()) return;
+  // if (!findPlayer()) return;
   const { y, x } = findPlayer();
+  // console.log(`y = ${y}; x = ${x}`);
 
   let action = false;
   if (key === "w") {
